@@ -10,7 +10,8 @@
         background(0);
         for (int p = 0; p <= num-1; p++){
             x[p] = (int)random(1,100);
-            rect(0,10*p,5*x[p],10);}
+            rect(0,10*p,5*x[p],10);
+            text(x[p],5*x[p],10*p+10);}
 
         println(x);
         step = 1;
@@ -69,7 +70,8 @@
         background(0);
         for (int p = 0; p < array.length; p++){
             fill(255);
-            rect(0, 10*p ,5 * array[p], 10);
+            rect(0, 10*p ,5 * array[p], 10)
+            text(array[p],5*array[p],10*p+10);;
 
         }
     }
