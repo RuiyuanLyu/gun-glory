@@ -1,4 +1,4 @@
-    int num = 90;
+    int num = 30;
     int [] x = new int[num];
     boolean bDone = false;
     int step, nSize, aBeginArg, bBeginArg, aLenArg, bLenArg;
