@@ -6,7 +6,7 @@
 
     void setup(){
         size(510, num * 10);
-        frameRate(10);
+        frameRate(15);
         background(0);
         for (int p = 0; p <= num-1; p++){
             x[p] = (int)random(1,100);
@@ -70,14 +70,19 @@
         background(0);
         for (int p = 0; p < array.length; p++){
             fill(255);
-            rect(0, 10*p ,5 * array[p], 10)
-            text(array[p],5*array[p],10*p+10);;
+            rect(0, 10*p ,5 * array[p], 10);
+            text(array[p],5*array[p],10*p+10);
 
         }
     }
 
     void draw()
     {
+            //Make presentation of large merges slower.
+            if (step == 2) frameRate(10);
+            if (step == 4) frameRate(5);
+            if (step == 8) frameRate(2.5);
+      
             aBeginArg = iGlobal; bBeginArg = iGlobal + step; aLenArg = step; bLenArg = step;
 
             if (aBeginArg >= nSize) aLenArg = 0;
