@@ -1,119 +1,109 @@
-    int num = 65;
-    int [] x = new int[num];
-    boolean bDone = false;
-    int step, nSize, aBeginArg, bBeginArg, aLenArg, bLenArg;
-  int iGlobal;
+ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+Player you;
+boolean shoot;
 
-    void setup(){
-        size(510, num * 10);
-        frameRate(15);
-        background(0);
-        for (int p = 0; p <= num-1; p++){
-            x[p] = (int)random(1,100);
-            rect(0,10*p,5*x[p],10);
-            text(x[p],5*x[p],10*p+10);}
+void setup(){
+  size(800,600);
+  background(244);
+  you = new Player();
+  shoot = false;
+}
 
-        println(x);
-        step = 1;
-        nSize = x.length;
-    iGlobal = 0;
+void draw(){
+  background(244);
+  if (shoot) bullets.add(new Bullet(you.px+30*cos(you.angle),you.py+30*sin(you.angle),mouseX,mouseY));
+  for(int i = 0; i< bullets.size(); i++){
+    bullets.get(i).move();
+    bullets.get(i).show();
+    if((bullets.get(i).sx>width)||(bullets.get(i).sx<0)
+    ||(bullets.get(i).sy>height)||(bullets.get(i).sy<0)){
+      bullets.remove(i);
     }
+  }
+  you.show();
+}
+
+void keyPressed(){
+  if (key == 'w') you.py -= you.vp;
+  if (key == 's') you.py += you.vp;
+  if (key == 'a') you.px -= you.vp;
+  if (key == 'd') you.px += you.vp;
+}
+
+void mousePressed(){
+  shoot = true;
+}
+
+void mouseReleased(){
+  shoot = false;
+}
 
 
-    int[] compare(int[] arSrc, int aBegin, int aLen, int bBegin, int bLen )
-    {
-        println("ab:", aBegin, "alen:", aLen, "bBegin:", bBegin, "bLen:", bLen);
-        int retLen = aLen + bLen;
-        int[] retTmp  = new int[retLen];
-        int indexa = 0, indexb = 0;
+class Bullet{
+  float vb = 3;//vbullet
+  float sx;//startx
+  float sy;//starty
+  float dx;
+  float dy;
+  float angle;
+  color col = color(random(255),random(255),random(255));
+  
+  public Bullet(float _sx, float _sy, float _dx, float _dy){
+    sx = _sx;
+    sy = _sy;
+    dx = _dx;
+    dy = _dy;
+    float deltax = dx - sx;
+    float deltay = dy - sy;
+    angle = atan2(deltay,deltax);  
+}
+  
+  public void move(){
+    //float deltax = dx - sx;
+    //float deltay = dy - sy;
+    //angle = atan2(deltay,deltax);
+    sx += vb*cos(angle);
+    sy += vb*sin(angle);
+  }
+  
+  public void show(){
+    strokeWeight(5);
+    stroke(col);
+    line(sx-vb*cos(angle),sy-vb*sin(angle),sx+vb*cos(angle),sy+vb*sin(angle));
+  }
+  
+}
 
-        int cacheIndex = 0;
-        int j = bBegin, i = 0;
-        int aDie = 0, bDie = 0;
-        for(i = aBegin; i < (aLen + aBegin) && aDie != aLen && bDie != bLen;)
-        {
-            println("ai:", arSrc[i], "bj:", arSrc[j]);
-            if (i >= arSrc.length || j >= arSrc.length) {
-                // all sorted already
-                break;
-            }
-            if (arSrc[i] < arSrc[j]) {
-                retTmp[cacheIndex] = arSrc[i];
-                aDie++;
-            } else {
-                retTmp[cacheIndex] = arSrc[j];
-                bDie++;
-                j++;
-                i -=1;
-            }
-            cacheIndex++;
-            i += 1;
-        }
-        //println("adie:", aDie, "bdie", bDie);
-        if (aDie == aLen) {
-            for(j=bBegin + bDie; j < bLen + bBegin; j++) {
-                println("ci:", cacheIndex, "bI:", j);
-                retTmp[cacheIndex++] = arSrc[j];
-            }
-        }
-        if (bDie == bLen) {
-            for(j=aBegin + aDie; j < aLen + aBegin; j++) {
-                println("ci:", cacheIndex, "aI:", j);
-                retTmp[cacheIndex++] = arSrc[j];
-            }
-        }
-//  println(retTmp);
-        return retTmp;
-    }
+class Player{
+  float vp = 3;//vplayer
+  float px;
+  float py;
+  float angle;
+  
+  public Player(){
+    px = random(width);
+    py = random(height);
+  }
+  
+  public void show(){
+    float deltax = mouseX - px;
+    float deltay = mouseY - py;
+    angle = atan2(deltay,deltax);
+    strokeWeight(1);
+    stroke(0);
+    ellipse(px,py,30,30);
+    translate(px,py);
+    rotate(angle);
+    rect(5,-5,20,10);
+  }
+}
 
-    void drawArray(int[] array) {
-        background(0);
-        for (int p = 0; p < array.length; p++){
-            fill(255);
-            rect(0, 10*p ,5 * array[p], 10);
-            text(array[p],5*array[p],10*p+10);
-
-        }
-    }
-
-    void draw()
-    {
-            //Make presentation of large merges slower.
-            if (step == 2) frameRate(10);
-            if (step == 4) frameRate(5);
-            if (step == 8) frameRate(2.5);
-      
-            aBeginArg = iGlobal; bBeginArg = iGlobal + step; aLenArg = step; bLenArg = step;
-
-            if (aBeginArg >= nSize) aLenArg = 0;
-            else if ((aBeginArg + aLenArg) >= nSize) aLenArg = nSize - aBeginArg;
-
-            if (bBeginArg >= nSize) bLenArg = 0;
-            else if ((bBeginArg + bLenArg) >= nSize) bLenArg = nSize - bBeginArg;
-
-            int [] cacheSorted = compare(x, aBeginArg, aLenArg, bBeginArg, bLenArg);
-
-            println("cache sorted:", cacheSorted);
-            for (int j = iGlobal, ci = 0; j < cacheSorted.length + iGlobal; j++, ci++)
-            {
-                x[j] = cacheSorted[ci];
-            }
-            drawArray(x);
-            if (cacheSorted.length == x.length) {
-                bDone = true;
-            }
-      if (iGlobal < nSize) {
-        iGlobal += step * 2;
-      }
-      
-      if (iGlobal >= nSize) {
-        step *= 2;
-        if(step >= nSize) step = 1;
-        iGlobal = 0;
-      }
-     
-      
-        println(step);
-        //drawArray(x);
-
-    }
+class Ememy{
+  float ve;//vemeny
+  float sx;
+  float sy;
+  float angle;
+  float health;
+  
+  
+}
