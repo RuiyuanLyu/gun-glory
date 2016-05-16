@@ -5,14 +5,16 @@ Player you;
 boolean shoot,up,down,left,right;
 int summonCount;
 int shootCount;
+float score;
 
 void setup(){
   size(800,600);
   background(244);
-  you = new Player();
+  you = new Player(5);
   shoot = false;
   summonCount = 0;
   shootCount = 0;
+  score = 0;
   up = false;
   down = false;
   left = false;
@@ -21,6 +23,14 @@ void setup(){
 
 void draw(){
   background(244);
+  fill(0);
+  text("score: " + score,0,10);
+  if (you.health<=0){
+    //score -=chasers.size()/2;
+    //score -=runners.size()/10;
+    //text("score: " + score,0,10);
+    noLoop();
+  }
   if (summonCount == 100) {
     chasers.add(new Chaser(random(width),random(height),1,10));
     runners.add(new Runner(random(width),0             ,0.5,20,random(width),random(height)));
@@ -33,7 +43,7 @@ void draw(){
   
   
   if (shoot){
-    if (shootCount == 3){
+    if (shootCount >= 1){
       bullets.add(new Bullet(you.px+30*cos(you.angle),you.py+30*sin(you.angle),mouseX,mouseY));
       //for(int i =0; i<10;i++) bullets.add(new Bullet(random(width),random(height),random(width),random(height)));
       shootCount = 0;
@@ -44,6 +54,7 @@ void draw(){
   
   
   for(int i = 0; i< chasers.size();i++){
+    boolean removed = false;
     for( int j = 0; j<bullets.size();j++){
       if ((abs(bullets.get(j).sx - chasers.get(i).sx)<10)&&(abs(bullets.get(j).sy - chasers.get(i).sy)<10)){
         chasers.get(i).health--;
@@ -52,12 +63,25 @@ void draw(){
     }
     chasers.get(i).move();
     chasers.get(i).show();
-    if(chasers.get(i).health<=0) chasers.remove(i);
+    if((abs(chasers.get(i).sx - you.px)<20)&&(abs(chasers.get(i).sy - you.py)<20)){
+      you.health --;
+      for(int k = 0; k < 1000; k++){
+        bullets.add(new Bullet(you.px,you.py,random(width),random(height)));
+      }
+      chasers.remove(i);
+      removed = true;
+    }
+    if((!removed)&&(chasers.get(i).health<=0)){
+      chasers.remove(i);
+      removed = true;
+      score++;
+    }
   }
   
   
   
   for(int i = 0; i< runners.size();i++){
+    boolean removed = false;
     for( int j = 0; j<bullets.size();j++){
       if ((abs(bullets.get(j).sx - runners.get(i).sx)<10)&&(abs(bullets.get(j).sy - runners.get(i).sy)<10)){
         runners.get(i).health--;
@@ -66,10 +90,24 @@ void draw(){
     }
     runners.get(i).move();
     runners.get(i).show();
-    if(runners.get(i).health<=0) runners.remove(i);
-    if((runners.get(i).sx>width)||(runners.get(i).sx<0)
-    ||(runners.get(i).sy>height)||(runners.get(i).sy<0)){
+    if((abs(runners.get(i).sx - you.px)<20)&&(abs(runners.get(i).sy - you.py)<20)){
+      you.health --;
+      for(int k = 0; k < 1000; k++){
+        bullets.add(new Bullet(you.px,you.py,random(width),random(height)));
+      }
       runners.remove(i);
+      removed = true;
+    }
+    if((!removed)&&(runners.get(i).health<=0)){
+      runners.remove(i);
+      removed = true;
+      score++;
+    }
+    if((!removed)&&
+    ((runners.get(i).sx>width)||(runners.get(i).sx<0)
+    ||(runners.get(i).sy>height)||(runners.get(i).sy<0))){
+      runners.remove(i);
+      removed = true;
     }
   }
   
@@ -153,10 +191,14 @@ class Player{
   float px;
   float py;
   float angle;
+  int health;
+  int maxhealth;
   
-  public Player(){
+  public Player( int _maxhealth){
     px = random(width);
     py = random(height);
+    health = _maxhealth;
+    maxhealth = _maxhealth;
   }
   
   public void show(){
@@ -168,10 +210,18 @@ class Player{
     stroke(0);
     ellipse(px,py,30,30);
     rectMode(CORNER);
+    pushMatrix();
     translate(px,py);
+    fill(255);
+    rect(-25,30,50,5);
+    fill(0);
+    rect(-25,30,50*health/maxhealth,5);
     rotate(angle);
+    fill(255);
     rect(5,-5,20,10);
+    popMatrix();
   }
+  
 }
 
 class Chaser{
@@ -205,7 +255,11 @@ class Chaser{
     strokeWeight(1);
     rectMode(CENTER);
     fill(255,0,0);
-    rect(sx,sy,20,20);
+    pushMatrix();
+    translate(sx,sy);
+    rotate(angle);
+    rect(0,0,20,20);
+    popMatrix();
     rectMode(CORNER);
     fill(255);
     rect(sx-25,sy+15,50,5);
@@ -246,7 +300,11 @@ class Runner extends Chaser{
     strokeWeight(1);
     rectMode(CENTER);
     fill(0,0,255);
-    rect(sx,sy,20,20);
+    pushMatrix();
+    translate(sx,sy);
+    rotate(angle);
+    rect(0,0,20,20);
+    popMatrix();
     rectMode(CORNER);
     fill(255);
     rect(sx-25,sy+15,50,5);
