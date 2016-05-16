@@ -26,9 +26,12 @@ void draw(){
   fill(0);
   text("score: " + score,0,10);
   if (you.health<=0){
-    //score -=chasers.size()/2;
-    //score -=runners.size()/10;
-    //text("score: " + score,0,10);
+    score -=chasers.size()/2;
+    score -=runners.size()/10;
+    background(244);
+    textSize(50);
+    text("YOU LOSE",width/2-200,height/2-25);
+    text("YOUR SCORE: " + score,width/2-200,height/2+25);
     noLoop();
   }
   if (summonCount == 100) {
@@ -59,6 +62,7 @@ void draw(){
       if ((abs(bullets.get(j).sx - chasers.get(i).sx)<10)&&(abs(bullets.get(j).sy - chasers.get(i).sy)<10)){
         chasers.get(i).health--;
         bullets.remove(j);
+        if(chasers.get(i).health<0) chasers.get(i).health = 0;
       }
     }
     chasers.get(i).move();
@@ -86,6 +90,7 @@ void draw(){
       if ((abs(bullets.get(j).sx - runners.get(i).sx)<10)&&(abs(bullets.get(j).sy - runners.get(i).sy)<10)){
         runners.get(i).health--;
         bullets.remove(j);
+        if(runners.get(i).health<0) runners.get(i).health = 0;
       }
     }
     runners.get(i).move();
