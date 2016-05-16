@@ -2,7 +2,7 @@ ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 ArrayList<Chaser> chasers = new ArrayList<Chaser>();
 ArrayList<Runner> runners = new ArrayList<Runner>();
 Player you;
-boolean shoot;
+boolean shoot,up,down,left,right;
 int summonCount;
 int shootCount;
 
@@ -13,23 +13,27 @@ void setup(){
   shoot = false;
   summonCount = 0;
   shootCount = 0;
+  up = false;
+  down = false;
+  left = false;
+  right = false;
 }
 
 void draw(){
   background(244);
   if (summonCount == 100) {
-    chasers.add(new Chaser(random(width),random(height),1,20));
-    runners.add(new Runner(random(width),0             ,0.5,50,random(width),random(height)));
-    runners.add(new Runner(random(width),height        ,0.5,50,random(width),random(height)));
-    runners.add(new Runner(0            ,random(height),0.5,50,random(width),random(height)));
-    runners.add(new Runner(width        ,random(height),0.5,50,random(width),random(height)));
+    chasers.add(new Chaser(random(width),random(height),1,10));
+    runners.add(new Runner(random(width),0             ,0.5,20,random(width),random(height)));
+    runners.add(new Runner(random(width),height        ,0.5,20,random(width),random(height)));
+    runners.add(new Runner(0            ,random(height),0.5,20,random(width),random(height)));
+    runners.add(new Runner(width        ,random(height),0.5,20,random(width),random(height)));
     summonCount = 0;
   }
   else summonCount++;
   
   
   if (shoot){
-    if (shootCount == 0){
+    if (shootCount == 3){
       bullets.add(new Bullet(you.px+30*cos(you.angle),you.py+30*sin(you.angle),mouseX,mouseY));
       //for(int i =0; i<10;i++) bullets.add(new Bullet(random(width),random(height),random(width),random(height)));
       shootCount = 0;
@@ -77,25 +81,35 @@ void draw(){
       bullets.remove(i);
     }
   }
-  
+  if(up)         you.py -= you.vp;
+  else if(down)  you.py += you.vp;
+  else if(left)  you.px -= you.vp;
+  else if(right) you.px += you.vp;
   you.show();
 }
 
 void keyPressed(){
-  if (key == 'w') you.py -= you.vp;
-  if (key == 's') you.py += you.vp;
-  if (key == 'a') you.px -= you.vp;
-  if (key == 'd') you.px += you.vp;
+  if (key == 'w') up = true;
+  else if (key == 's') down = true;
+  else if (key == 'a') left = true;
+  else if (key == 'd') right = true;
+}
+
+void keyReleased(){
+  if (key == 'w') up = false;
+  else if (key == 's') down = false;
+  else if (key == 'a') left = false;
+  else if (key == 'd') right = false;
 }
 
 void mousePressed(){
   shoot = true;
-  you.vp = 3;
+  you.vp = 2;
 }
 
 void mouseReleased(){
   shoot = false;
-  you.vp = 5;
+  you.vp = 3;
 }
 
 
