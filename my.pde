@@ -1,5 +1,6 @@
 ArrayList<Bullet> bullets = new ArrayList<Bullet>();
-ArrayList<Emeny> emenys = new ArrayList<Emeny>();
+ArrayList<Chaser> chasers = new ArrayList<Chaser>();
+ArrayList<Runner> runners = new ArrayList<Runner>();
 Player you;
 boolean shoot;
 int summonCount;
@@ -17,27 +18,55 @@ void setup(){
 void draw(){
   background(244);
   if (summonCount == 100) {
-    emenys.add(new Emeny(random(width),random(height),1,5));
+    chasers.add(new Chaser(random(width),random(height),1,20));
+    runners.add(new Runner(random(width),0             ,0.5,50,random(width),random(height)));
+    runners.add(new Runner(random(width),height        ,0.5,50,random(width),random(height)));
+    runners.add(new Runner(0            ,random(height),0.5,50,random(width),random(height)));
+    runners.add(new Runner(width        ,random(height),0.5,50,random(width),random(height)));
     summonCount = 0;
   }
   else summonCount++;
+  
+  
   if (shoot){
-    if (shootCount == 8){
+    if (shootCount == 0){
       bullets.add(new Bullet(you.px+30*cos(you.angle),you.py+30*sin(you.angle),mouseX,mouseY));
+      //for(int i =0; i<10;i++) bullets.add(new Bullet(random(width),random(height),random(width),random(height)));
       shootCount = 0;
     }
     else shootCount++;
   }
-  for(int i = 0; i< emenys.size();i++){
+  
+  
+  
+  for(int i = 0; i< chasers.size();i++){
     for( int j = 0; j<bullets.size();j++){
-      if ((abs(bullets.get(j).sx - emenys.get(i).sx)<10)&&(abs(bullets.get(j).sy - emenys.get(i).sy)<10)){
-        emenys.get(i).health--;
+      if ((abs(bullets.get(j).sx - chasers.get(i).sx)<10)&&(abs(bullets.get(j).sy - chasers.get(i).sy)<10)){
+        chasers.get(i).health--;
         bullets.remove(j);
       }
     }
-    emenys.get(i).move();
-    emenys.get(i).show();
-    if(emenys.get(i).health<=0) emenys.remove(i);
+    chasers.get(i).move();
+    chasers.get(i).show();
+    if(chasers.get(i).health<=0) chasers.remove(i);
+  }
+  
+  
+  
+  for(int i = 0; i< runners.size();i++){
+    for( int j = 0; j<bullets.size();j++){
+      if ((abs(bullets.get(j).sx - runners.get(i).sx)<10)&&(abs(bullets.get(j).sy - runners.get(i).sy)<10)){
+        runners.get(i).health--;
+        bullets.remove(j);
+      }
+    }
+    runners.get(i).move();
+    runners.get(i).show();
+    if(runners.get(i).health<=0) runners.remove(i);
+    if((runners.get(i).sx>width)||(runners.get(i).sx<0)
+    ||(runners.get(i).sy>height)||(runners.get(i).sy<0)){
+      runners.remove(i);
+    }
   }
   
     for(int i = 0; i< bullets.size(); i++){
@@ -131,15 +160,17 @@ class Player{
   }
 }
 
-class Emeny{
-  float ve;//vemeny
+class Chaser{
+  float ve;//vChaser
   float sx;
   float sy;
   float angle;
   int health;
   int maxhealth;
   
-  public Emeny(float _sx, float _sy, float _ve, int _maxhealth){
+  public Chaser(){}
+  
+  public Chaser(float _sx, float _sy, float _ve, int _maxhealth){
     sx = _sx;
     sy = _sy;
     ve = _ve;
@@ -159,15 +190,53 @@ class Emeny{
     stroke(0);
     strokeWeight(1);
     rectMode(CENTER);
-    //translate(sx,sy);
-    //rotate(angle);
-    fill(255);
+    fill(255,0,0);
     rect(sx,sy,20,20);
-    //rect(sx,sy+20,50,10);
     rectMode(CORNER);
-    rect(sx-25,sy+15,50,10);
+    fill(255);
+    rect(sx-25,sy+15,50,5);
     fill(0);
-    rect(sx-25,sy+15,50*health/maxhealth,10);
+    rect(sx-25,sy+15,50*health/maxhealth,5);
   }
   
+}
+
+class Runner extends Chaser{
+  public Runner(float _sx, float _sy, float _ve, int _maxhealth, float _angle){
+    sx = _sx;
+    sy = _sy;
+    ve = _ve;
+    maxhealth = _maxhealth;
+    health = _maxhealth;
+    angle = _angle;
+  }
+  
+  public Runner(float _sx, float _sy, float _ve, int _maxhealth, float _dx, float _dy){
+    float deltax = _dx - _sx;
+    float deltay = _dy - _sy;
+    sx = _sx;
+    sy = _sy;
+    ve = _ve;
+    maxhealth = _maxhealth;
+    health = _maxhealth;
+    angle = atan2(deltay,deltax);
+  }
+  
+  public void move(){
+    sx += ve*cos(angle);
+    sy += ve*sin(angle);
+  }
+  
+  public void show(){
+    stroke(0);
+    strokeWeight(1);
+    rectMode(CENTER);
+    fill(0,0,255);
+    rect(sx,sy,20,20);
+    rectMode(CORNER);
+    fill(255);
+    rect(sx-25,sy+15,50,5);
+    fill(0);
+    rect(sx-25,sy+15,50*health/maxhealth,5);
+  }
 }
