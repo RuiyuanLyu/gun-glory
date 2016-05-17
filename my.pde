@@ -8,6 +8,7 @@ int summonCount;
 int shootCount;
 int boomCount;
 int score;
+int level;
 int echohealth;
 
 void setup(){
@@ -20,7 +21,8 @@ void setup(){
   shootCount = 0;
   boomCount = 0;
   score = 0;
-  echohealth = 8;
+  level = 1;
+  echohealth = 3;
   up = false;
   down = false;
   left = false;
@@ -29,21 +31,28 @@ void setup(){
 
 void draw(){
   background(244);
+  //if ((score > 2000)&&(score<5000)) level = 2;
+  //else if (score >5000) level = 3;
   if (summonCount == 100) {
-    if (random(100)>50) chasers.add(new Chaser(random(width),random(height),1,30));
-    if (random(100)>50) runners.add(new Runner(random(width),0             ,0.5,20,random(width),random(height)));
-    if (random(100)>50) runners.add(new Runner(random(width),height        ,0.5,20,random(width),random(height)));
-    if (random(100)>50) runners.add(new Runner(0            ,random(height),0.5,20,random(width),random(height)));
-    if (random(100)>50) runners.add(new Runner(width        ,random(height),0.5,20,random(width),random(height)));
-    if (random(100)>50) echoes.add(new Echo(random(width),random(height),2,echohealth,echohealth,random(width),random(height)));
+    if (random(100)>75-level*25) chasers.add(new Chaser(random(width),random(height),1,50));
+    if (random(100)>75-level*25) runners.add(new Runner(random(width),0             ,0.5,20,random(width),random(height)));
+    if (random(100)>75-level*25) runners.add(new Runner(random(width),height        ,0.5,20,random(width),random(height)));
+    if (random(100)>75-level*25) runners.add(new Runner(0            ,random(height),0.5,20,random(width),random(height)));
+    if (random(100)>75-level*25) runners.add(new Runner(width        ,random(height),0.5,20,random(width),random(height)));
+    if (random(100)>75-level*25) echoes.add(new Echo(random(width),random(height),2,echohealth,echohealth,random(width),random(height)));
     summonCount = 0;
   }
   else summonCount++;
   
   
   if (shoot){
-    if (shootCount >= 2){
-      bullets.add(new Bullet(you.px+30*cos(you.angle),you.py+30*sin(you.angle),mouseX,mouseY));    
+    if (shootCount >= 0){
+      //bullets.add(new Bullet(you.px+30*cos(you.angle),you.py+30*sin(you.angle),mouseX,mouseY)); 
+      //if(level == 1)bullets.add(new Bullet(you.px+40*cos(you.angle)-10*sin(you.angle),you.py+40*sin(you.angle)+10*cos(you.angle),mouseX-10*sin(you.angle),mouseY+10*cos(you.angle)));
+      //if(level == 2)bullets.add(new Bullet(you.px+40*cos(you.angle)-5*sin(you.angle),you.py+40*sin(you.angle)+5*cos(you.angle),mouseX-5*sin(you.angle),mouseY+5*cos(you.angle))); 
+      if(level == 1||level == 3)bullets.add(new Bullet(you.px+40*cos(you.angle),you.py+40*sin(you.angle),mouseX,mouseY)); 
+      //if(level == 2)bullets.add(new Bullet(you.px+40*cos(you.angle)+5*sin(you.angle),you.py+40*sin(you.angle)-5*cos(you.angle),mouseX+5*sin(you.angle),mouseY-5*cos(you.angle))); 
+      //if(level == 1)bullets.add(new Bullet(you.px+40*cos(you.angle)+10*sin(you.angle),you.py+40*sin(you.angle)-10*cos(you.angle),mouseX+10*sin(you.angle),mouseY-10*cos(you.angle))); 
       //for(int i =0; i<10;i++) bullets.add(new Bullet(random(width),random(height),random(width),random(height)));
       shootCount = 0;
     }
@@ -52,10 +61,10 @@ void draw(){
   
   if (boom) {
     if (boomCount >= 500){
-      for(int k = 0; k < 500; k++){
+      for(int k = 0; k <500; k++){
         bullets.add(new Bullet(you.px,you.py,random(width),random(height)));
       }
-      boomCount = 0;
+      boomCount -= 500;
     }
   }
   boomCount++;
@@ -138,7 +147,11 @@ void draw(){
     for( int j = 0; j<bullets.size();j++){
       if ((abs(bullets.get(j).sx - echoes.get(i).sx)<10)&&(abs(bullets.get(j).sy - echoes.get(i).sy)<10)){
         echoes.get(i).health--;
-        if(echoes.get(i).health>=1) echoes.add(new Echo(echoes.get(i).sx,echoes.get(i).sy,2,echohealth,echoes.get(i).health,random(width),random(height)));
+        if(echoes.get(i).health>=1){
+          for(int k = 0; k < 9  ; k++){
+            echoes.add(new Echo(echoes.get(i).sx,echoes.get(i).sy,2,echohealth,echoes.get(i).health,random(width),random(height)));
+          }
+        }
         bullets.remove(j);
         if(echoes.get(i).health<0) echoes.get(i).health = 0;
       }
@@ -286,7 +299,8 @@ class Player{
     fill(255);
     strokeWeight(1);
     stroke(0);
-    ellipse(px,py,30,30);
+    if(level == 1||level == 2) ellipse(px,py,40,40);
+    else ellipse(px,py,30,30);
     rectMode(CORNER);
     pushMatrix();
     translate(px,py);
@@ -296,7 +310,9 @@ class Player{
     rect(-25,30,50*health/maxhealth,5);
     rotate(angle);
     fill(255);
-    rect(5,-5,20,10);
+    //if(level == 1||level == 2) rect(5,-10,30,20);
+    //else
+    rect(5,-5,30,10);
     popMatrix();
   }
   
@@ -425,3 +441,4 @@ class Echo extends Runner{
   }
   
 }
+
