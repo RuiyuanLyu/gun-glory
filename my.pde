@@ -3,9 +3,10 @@ ArrayList<Chaser> chasers = new ArrayList<Chaser>();
 ArrayList<Runner> runners = new ArrayList<Runner>();
 ArrayList<Echo> echoes = new ArrayList<Echo>();
 Player you;
-boolean shoot,up,down,left,right;
+boolean shoot,boom,up,down,left,right;
 int summonCount;
 int shootCount;
+int boomCount;
 int score;
 int echohealth;
 
@@ -14,8 +15,10 @@ void setup(){
   background(244);
   you = new Player(5);
   shoot = false;
+  boom = false;
   summonCount = 0;
   shootCount = 0;
+  boomCount = 0;
   score = 0;
   echohealth = 8;
   up = false;
@@ -26,28 +29,36 @@ void setup(){
 
 void draw(){
   background(244);
-  fill(0);
-  text("score: " + score,0,10);
   if (summonCount == 100) {
-    if (random(100)>50) chasers.add(new Chaser(random(width),random(height),1,20));
+    if (random(100)>50) chasers.add(new Chaser(random(width),random(height),1,30));
     if (random(100)>50) runners.add(new Runner(random(width),0             ,0.5,20,random(width),random(height)));
     if (random(100)>50) runners.add(new Runner(random(width),height        ,0.5,20,random(width),random(height)));
     if (random(100)>50) runners.add(new Runner(0            ,random(height),0.5,20,random(width),random(height)));
     if (random(100)>50) runners.add(new Runner(width        ,random(height),0.5,20,random(width),random(height)));
-    if (random(100)>50) echoes.add(new Echo(random(width),random(height),0.5,echohealth,echohealth,random(width),random(height)));
+    if (random(100)>50) echoes.add(new Echo(random(width),random(height),2,echohealth,echohealth,random(width),random(height)));
     summonCount = 0;
   }
   else summonCount++;
   
   
   if (shoot){
-    if (shootCount >= 0){
-      bullets.add(new Bullet(you.px+30*cos(you.angle),you.py+30*sin(you.angle),mouseX,mouseY));
+    if (shootCount >= 2){
+      bullets.add(new Bullet(you.px+30*cos(you.angle),you.py+30*sin(you.angle),mouseX,mouseY));    
       //for(int i =0; i<10;i++) bullets.add(new Bullet(random(width),random(height),random(width),random(height)));
       shootCount = 0;
     }
-    else shootCount++;
+    shootCount++;
   }
+  
+  if (boom) {
+    if (boomCount >= 500){
+      for(int k = 0; k < 500; k++){
+        bullets.add(new Bullet(you.px,you.py,random(width),random(height)));
+      }
+      boomCount = 0;
+    }
+  }
+  boomCount++;
   
   
   
@@ -127,7 +138,7 @@ void draw(){
     for( int j = 0; j<bullets.size();j++){
       if ((abs(bullets.get(j).sx - echoes.get(i).sx)<10)&&(abs(bullets.get(j).sy - echoes.get(i).sy)<10)){
         echoes.get(i).health--;
-        if(echoes.get(i).health>=1) echoes.add(new Echo(echoes.get(i).sx,echoes.get(i).sy,0.5,echohealth,echoes.get(i).health,random(width),random(height)));
+        if(echoes.get(i).health>=1) echoes.add(new Echo(echoes.get(i).sx,echoes.get(i).sy,2,echohealth,echoes.get(i).health,random(width),random(height)));
         bullets.remove(j);
         if(echoes.get(i).health<0) echoes.get(i).health = 0;
       }
@@ -173,6 +184,11 @@ void draw(){
   else if(left)  you.px -= you.vp;
   else if(right) you.px += you.vp;
   you.show();
+  
+  fill(0);
+  text("score: " + score,0,10);
+  if (boomCount >= 500) text("Bomb Ready",you.px-28,you.py+5);
+  
   if (you.health<=0){
     score -=chasers.size()*20;
     score -=runners.size()*10;
@@ -191,6 +207,7 @@ void keyPressed(){
   else if (key == 's') down = true;
   else if (key == 'a') left = true;
   else if (key == 'd') right = true;
+  if (key == ' ') boom = true;
 }
 
 void keyReleased(){
@@ -198,6 +215,7 @@ void keyReleased(){
   else if (key == 's') down = false;
   else if (key == 'a') left = false;
   else if (key == 'd') right = false;
+  if (key == ' ') boom = false;
 }
 
 void mousePressed(){
