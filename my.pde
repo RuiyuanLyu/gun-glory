@@ -62,7 +62,7 @@ void draw(){
         adjustx = random(width);
         adjusty = random(height);
         }
-        summoners.add(new Summoner(adjustx,adjusty,0.1,200*difficulty,random(width),random(height),summontime));
+        summoners.add(new Summoner(adjustx,adjusty,0.1,20*runnerhealth*difficulty,random(width),random(height),summontime));
       }
       level3release = true;
     }
@@ -93,7 +93,7 @@ void draw(){
       adjustx = random(width);
       adjusty = random(height);
       }
-      summoners.add(new Summoner(adjustx,adjusty,0.1,10*runnerhealth*difficulty,random(width),random(height),summontime));
+      summoners.add(new Summoner(adjustx,adjusty,0.1,20*runnerhealth*difficulty,random(width),random(height),summontime));
     }
     
     
@@ -357,7 +357,7 @@ void mouseReleased(){
 
 
 class Bullet{
-  float vb = 3;//vbullet
+  float vb = 5;//vbullet
   float sx;//startx
   float sy;//starty
   float dx;
