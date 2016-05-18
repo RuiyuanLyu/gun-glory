@@ -14,6 +14,7 @@ int immunetime;
 int summontime;
 int score;
 int level;
+boolean level3release;
 int echohealth;
 int difficulty;
 float echospeed;
@@ -33,6 +34,7 @@ void setup(){
   immunetime = 100;
   score = 0;
   level = 1;
+  level3release = false;
   difficulty = 1;
   echohealth = 5;
   echospeed = 0.5;
@@ -50,6 +52,18 @@ void draw(){
   else if ((score >= 8000)&&(score < 10000)){
     difficulty = 3;
     echohealth = 6;
+    if (!level3release){
+      for(int i = 0 ; i < 5; i++){
+        float adjustx = random(width);
+        float adjusty = random(height);
+        while ((abs(you.px - adjustx)<100)&&(abs(you.py - adjusty)<100)){
+        adjustx = random(width);
+        adjusty = random(height);
+        }
+        summoners.add(new Summoner(adjustx,adjusty,0.1,200*difficulty,random(width),random(height),summontime));
+      }
+      level3release = true;
+    }
   }
   
   if (generateCount == 100) {
@@ -73,7 +87,7 @@ void draw(){
       adjustx = random(width);
       adjusty = random(height);
       }
-      summoners.add(new Summoner(adjustx,adjusty,0.5,200*difficulty,random(width),random(height),summontime));
+      summoners.add(new Summoner(adjustx,adjusty,0.1,200*difficulty,random(width),random(height),summontime));
     }
     
     if (random(100)>50) {
