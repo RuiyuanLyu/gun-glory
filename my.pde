@@ -15,6 +15,7 @@ int summontime;
 int score;
 int level;
 boolean level3release;
+int runnerhealth;
 int echohealth;
 int difficulty;
 float echospeed;
@@ -36,6 +37,7 @@ void setup(){
   level = 1;
   level3release = false;
   difficulty = 1;
+  runnerhealth = 20;
   echohealth = 5;
   echospeed = 0.5;
   up = false;
@@ -67,6 +69,12 @@ void draw(){
   }
   
   if (generateCount == 100) {
+    if (random(100)>50) runners.add(new Runner(random(width),0             ,0.5,runnerhealth*difficulty,random(width),random(height)));
+    if (random(100)>50) runners.add(new Runner(random(width),height        ,0.5,runnerhealth*difficulty,random(width),random(height)));
+    if (random(100)>50) runners.add(new Runner(0            ,random(height),0.5,runnerhealth*difficulty,random(width),random(height)));
+    if (random(100)>50) runners.add(new Runner(width        ,random(height),0.5,runnerhealth*difficulty,random(width),random(height)));
+    
+    
     if (random(100)>50){
       float adjustx = random(width);
       float adjusty = random(height);
@@ -76,19 +84,18 @@ void draw(){
       }
       chasers.add(new Chaser(adjustx,adjusty,1,50*difficulty));
     }
-    if (random(100)>50) runners.add(new Runner(random(width),0             ,0.5,20*difficulty,random(width),random(height)));
-    if (random(100)>50) runners.add(new Runner(random(width),height        ,0.5,20*difficulty,random(width),random(height)));
-    if (random(100)>50) runners.add(new Runner(0            ,random(height),0.5,20*difficulty,random(width),random(height)));
-    if (random(100)>50) runners.add(new Runner(width        ,random(height),0.5,20*difficulty,random(width),random(height)));
-    if (random(100)>90) {
+    
+    
+    if (random(100)>95) {
       float adjustx = random(width);
       float adjusty = random(height);
       while ((abs(you.px - adjustx)<100)&&(abs(you.py - adjusty)<100)){
       adjustx = random(width);
       adjusty = random(height);
       }
-      summoners.add(new Summoner(adjustx,adjusty,0.1,200*difficulty,random(width),random(height),summontime));
+      summoners.add(new Summoner(adjustx,adjusty,0.1,10*runnerhealth*difficulty,random(width),random(height),summontime));
     }
+    
     
     if (random(100)>50) {
       float adjustx = random(width);
@@ -242,18 +249,7 @@ void draw(){
       removed = true;
     }
   }
-  
-  
-  
-    for(int i = 0; i< bullets.size(); i++){
-    bullets.get(i).move();
-    bullets.get(i).show();
-    if((bullets.get(i).sx>width)||(bullets.get(i).sx<0)
-    ||(bullets.get(i).sy>height)||(bullets.get(i).sy<0)){
-      bullets.remove(i);
-    }
-  }
-  
+ 
   
   for(int i = 0; i< summoners.size();i++){
     boolean removed = false;
@@ -584,7 +580,7 @@ class Summoner extends Runner{
   public void summon(){
     if(summonCount >= summonTime){
       for(int j = 0; j < 1; j++){
-        runners.add(new Runner(sx,sy,2.5,20*difficulty,random(width),random(height)));
+        runners.add(new Runner(sx,sy,2.5,runnerhealth*difficulty,random(width),random(height)));
       }
       summonCount = 0;
     }
